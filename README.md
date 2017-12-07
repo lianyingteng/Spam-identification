@@ -44,27 +44,27 @@
 ## 程序脚本的使用说明
 #### step_1_buildModel_for_trainData.py  \# 用于构建模型 - 模型保存在model文件夹下
    程序说明：
->> 基于bagging的思想，随机重采样获得50个不同的基分类器<br>
+> 基于bagging的思想，随机重采样获得50个不同的基分类器<br>
    
    用法：
->> python step_1_buildModel_for_trainData.py -t train.txt
+> python step_1_buildModel_for_trainData.py -t train.txt
 
 #### step2_obtainPredictLabel_for_testData.py \# 给定无标签数据，用于生成样本的预测标签
   程序说明：
->> 基于现有模型，预测无标签样本的分类标签
+> 基于现有模型，预测无标签样本的分类标签
 
   用法： 
->> python step2_obtainPredictLabel_for_testData.py -t test.txt -o output.txt
+> python step2_obtainPredictLabel_for_testData.py -t test.txt -o output.txt
 
 #### ObtainSampleError_main.py
   程序说明：
->> 用于 核实样本数据（手动将数据中标记不正确的样本修正）
+> 用于 核实样本数据（手动将数据中标记不正确的样本修正）
 
 #### train_crossVaildation_main.py
   程序说明：
 >>该程序用于获得以下内容：<br>
->> * 绘制学习曲线 - 损失函数随样本量m的变化曲线<br>
->> * 绘制验证曲线 - ACC 随 正则化参数的 变化曲线 （选择最优正则参数）<br>
->> * 查看验证集错误分类的样本，（用于发现新特征） - 将训练数据集分为训练集和验证集， 用训练集训练模型， 用验证集测试，输出验证集错误分类的样本<br>
->> * 查找错误分类的样本 ， 并将其保存到文件中 - 用于校正样本数据<br>
->> * 创建初步的模型 model保存到文件中 - 查看模型性能<br>
+> * 绘制学习曲线 - 损失函数随样本量m的变化曲线<br>
+> * 绘制验证曲线 - ACC 随 正则化参数的 变化曲线 （选择最优正则参数）<br>
+> * 查看验证集错误分类的样本，（用于发现新特征） - 将训练数据集分为训练集和验证集， 用训练集训练模型， 用验证集测试，输出验证集错误分类的样本<br>
+> * 查找错误分类的样本 ， 并将其保存到文件中 - 用于校正样本数据<br>
+> * 创建初步的模型 model保存到文件中 - 查看模型性能<br>
