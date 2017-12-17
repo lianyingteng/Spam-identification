@@ -2,6 +2,17 @@
 
 		假定测试数据有标签
 """
+def obtainEachSampleProability(outPreProbability, length):
+	"""得到每个样本的 预测为正类（1）的概率
+	"""
+	mean_values = []
+	
+	for eachSample in np.split(outPreProbability, length, axis=0):
+		sample_feas = list(eachSample[0][1:])
+		mean_pro = np.mean(sample_feas)
+		mean_values.append(mean_pro)
+
+	return mean_values
 
 def load_model_file(sub_num):
 	"""从保存的模型中载入 stop word、 Tfidf_vectorizer、 ont hot编码器
@@ -101,43 +112,43 @@ from sklearn.metrics import roc_auc_score
 if __name__ == '__main__':
 
 	test_file, out_preLabel_file = argsParser()
+	model_number = 50
 
-
-	all_samples = open(test_file).readlines()
+	all_samples = open(test_file, encoding='utf-8').readlines()
 	length = len(all_samples)
-	pre_label = np.array([2]*length, dtype='<U1')[:, np.newaxis]
-	outPreProbability = np.zeros(length)
-	invaild_model = 0 # 无效模型
+	# pre_label = np.array(['']*length, dtype='<U1')[:, np.newaxis]
+	outPreProbability = np.zeros(length)[:, np.newaxis] # 保存每种所有样本的50中概率
+	vaild_model = model_number # 有效模型
 
-	subClasser_num = 50
-	pre_pros = []###
+	subClasser_num = model_number
 	for i in range(subClasser_num):
-		print("第%d个模型"%(i+1))
+		print('正在分析第%d个模型'%(i+1))
 		with open("model\\LRmodel_%d.pkl"%i, 'rb') as f:
 			model = pickle.load(f)
 
 		try:
 			X = feature_extract_testSet(all_samples, i)
 		except:
-			invaild_model += 1
+			vaild_model -= 1
 			continue
 
-		p_y = model.predict(X) # 得到预测标签
-		pre_label = np.hstack((pre_label, p_y[:,np.newaxis]))
+		#p_y = model.predict(X) # 得到预测标签
+		#pre_label = np.hstack((pre_label, p_y[:,np.newaxis]))
+		
 		pre_pro = model.predict_proba(X)[:, 1]
-		pre_pros.append(float(pre_pro)) ###
-		outPreProbability += pre_pro
+		outPreProbability = np.hstack((outPreProbability, pre_pro[:,np.newaxis]))
 
-	print(list(pre_label))
-	pre_label = list(map(lambda asd: '1' if list(asd).count('1') > list(asd).count('0') else '0', pre_label))
-	outPreProbability = outPreProbability/(50-invaild_model)
+
+
+	#pre_label = list(map(
+		#lambda asd: '1' if (list(asd).count('1')>(vaild_model//2)) else '0', pre_label))
+	print(list(outPreProbability))
+	outPreProbability = obtainEachSampleProability(outPreProbability, length) # 获得每一样本对应的平均概率
 	# print(pre_label)
-	pre_pros.sort()
-	print(pre_pros)####
 	# 生成 有标签数据 文档
 	with open(out_preLabel_file, 'w') as f:
 		for i in range(len(all_samples)):
-			f.write("%s\t%f\t%s"%(p_y[i], outPreProbability[i], all_samples[i]))
+			f.write("%s\t%.6f\t%s"%('1' if outPreProbability[i] > 0.5 else '0',outPreProbability[i], all_samples[i]))
 
 	print("Finished!")
-	print("无效模型数： %d\\%d"%(invaild_model, subClasser_num))
+	print("%d\\%d"%(vaild_model, subClasser_num))
